@@ -15,7 +15,7 @@ contract RDaiAdmin is AragonApp {
     event AddToken(address identifier, address rToken);
     event HatChanged(address sender, address target, uint256 hatId);
     /// State
-    Agent public council;
+    Agent public agent;
     Voting public voting;
 
     mapping(bytes32 => address) public rTokens;
@@ -44,7 +44,7 @@ contract RDaiAdmin is AragonApp {
 
         initialized();
         // setup agents
-        council = Agent(_agent);
+        agent = Agent(_agent);
         voting = Voting(_voting);
         emit NewAgentSet(_agent);
         //setup rTokens
