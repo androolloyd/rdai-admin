@@ -8,7 +8,7 @@
     "@aragon/apps-token-manager": "2.1.0",
     "@aragon/apps-voting": "2.1.0",
     "@aragon/os": "^4.2.1",
-    "core-js": "^3.3.3"
+    "core-js": "^3.3.5"
   },
   "devDependencies": {
     "@aragon/cli": "^6.0.0",

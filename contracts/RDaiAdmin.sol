@@ -12,7 +12,7 @@ contract RDaiAdmin is AragonApp {
     /// Events
     event NewAgentSet(address agent);
     event NewVotingSet(address voting);
-    event AddToken(address identifier, address rToken);
+    event AddToken(bytes32 identifier, address rToken);
     event HatChanged(address sender, address target, uint256 hatId);
     /// State
     Agent public agent;
@@ -48,8 +48,7 @@ contract RDaiAdmin is AragonApp {
         voting = Voting(_voting);
         emit NewAgentSet(_agent);
         //setup rTokens
-        addToken(keccak256("rDAI"), _rToken);
-        emit AddToken(keccak256("rDAI"), _rToken);
+        _addToken(keccak256("rDAI"), _rToken);
     }
 
     function _addToken(
@@ -58,7 +57,8 @@ contract RDaiAdmin is AragonApp {
     )
         internal
     {
-        rTokens[_tokenType] = IRTokenAdmin(_tokenAddress);
+        rTokens[_tokenType] = _tokenAddress;
+        emit AddToken(keccak256("rDAI"), _tokenAddress);
     }
 
     function _newVote(
@@ -68,6 +68,7 @@ contract RDaiAdmin is AragonApp {
         bool _executeIfDecided
     )
         internal
+        returns (uint256 voteId)
     {
         voteId = voting.newVote(_executionScript, _metadata, _castVote, _executeIfDecided);
     }
@@ -103,7 +104,7 @@ contract RDaiAdmin is AragonApp {
     )
         external
     {
-        require(canExecute(_voteId), "executeVote::NO_EXECUTE_VOTE_ID");
+        require(voting.canExecute(_voteId), "executeVote::NO_EXECUTE_VOTE_ID");
         string memory functionSignature = "executeVote(uint256)";
         bytes memory executeVoteData = abi.encodeWithSignature(functionSignature, _voteId);
         agent.execute(address(voting), 0, executeVoteData);
