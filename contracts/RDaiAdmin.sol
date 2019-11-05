@@ -70,7 +70,8 @@ contract RDaiAdmin is IForwarder, AragonApp {
     function initialize(
         address _agent,
         address _voting,
-        address _rToken
+        string [] _rTokenType,
+        address[] _rTokenAddress
     )
         public
         onlyInit
@@ -82,7 +83,10 @@ contract RDaiAdmin is IForwarder, AragonApp {
         voting = Voting(_voting);
         emit NewAgentSet(_agent);
         //setup rTokens
-        _addToken(keccak256("rDAI"), _rToken);
+        for(uint i = 0; i < _rTokenType.length; i++)
+        {
+            _addToken(keccak256(_rTokenType[i]), _rTokenAddress[i]);
+        }
     }
 
     function addToken(
