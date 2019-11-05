@@ -24,7 +24,7 @@ root
   - **src**: Source files.
   - [**package.json**](https://docs.npmjs.com/creating-a-package-json-file): Frontend npm configuration file.
 - **contracts**: Smart Constracts folder.
-  - `CounterApp.sol`: Aragon app contract example.
+  - `RDaiAdmin.sol`: RDaiAdmin App - uses Aragon Agent, and Voting to enable administrative functions of the [rToken contract](https://github.com/decentral-ee/rtoken-contracts)
   - `Template.sol`: [Aragon Template](https://hack.aragon.org/docs/templates-intro) to deploy a fully functional DAO.
 - [**migrations**](https://truffleframework.com/docs/truffle/getting-started/running-migrations): Migrations folder.
 - **test**: Tests folder.
