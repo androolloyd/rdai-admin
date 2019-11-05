@@ -10,12 +10,12 @@ contract RDaiAdmin is IForwarder, AragonApp {
     event NewAgentSet(address agent);
     event NewVotingSet(address voting);
     event AddToken(bytes32 identifier, address rToken);
-    event HatChanged(address sender, address target, uint256 hatId);
+    event ContractHatChanged(address target, uint256 hatId);
     /// State
     Agent public agent;
     Voting public voting;
 
-    mapping(bytes32 => address) public rTokens;
+    mapping(uint256 => address) public rTokens;
 
     /// ACL
     bytes32 public constant SET_AGENT_ROLE = keccak256("SET_AGENT_ROLE");
@@ -53,7 +53,7 @@ contract RDaiAdmin is IForwarder, AragonApp {
     {
         return canPerform(
             _sender,
-            CREATE_VOTE,
+            voting.CREATE_VOTES_ROLE,
             arr()
         );
     }
@@ -67,7 +67,7 @@ contract RDaiAdmin is IForwarder, AragonApp {
     }
 
     function _setToken(
-        bytes32 _tokenType,
+        uint256 _tokenType,
         address _tokenAddress
     )
         internal
@@ -80,7 +80,7 @@ contract RDaiAdmin is IForwarder, AragonApp {
     function initialize(
         address _agent,
         address _voting,
-        string _rTokenType,
+        uint256 _rTokenType,
         address _rTokenAddress
     )
         public
@@ -102,13 +102,22 @@ contract RDaiAdmin is IForwarder, AragonApp {
 
 
     function addToken(
-        bytes32 _tokenType,
+        uint256 _tokenType,
         address _tokenAddress
     )
         public
-//        authP(ADD_TOKEN, arr(_tokenAddress, uint256(_tokenType)))
+        authP(ADD_TOKEN, arr(_tokenAddress, _tokenType))
     {
         _setToken(_tokenType, _tokenAddress);
+    }
+
+    function removeToken(
+        uint256 _tokenType
+    )
+    public
+    authP(REMOVE_TOKEN, arr(_tokenType))
+    {
+        _setToken(_tokenType, address(0));
     }
 
 
@@ -127,6 +136,6 @@ contract RDaiAdmin is IForwarder, AragonApp {
 
         agent.execute(rTokens[_rToken], 0, changeHatData); // target, value, data
 
-        emit HatChanged(msg.sender, _target, _hatId);
+        emit ContractHatChanged(_target, _hatId);
     }
 }

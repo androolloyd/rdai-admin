@@ -83,7 +83,7 @@ contract Template is TemplateBase {
         // Initialize apps
         agent.initialize();
         //
-        rDaiAdminApp.initialize(address(agent), address(voting), "rDAI", address(token)); //set this to rdai deployed token address
+        rDaiAdminApp.initialize(address(agent), address(voting), uint256(keccak256("rDAI")), address(token)); //set this to rdai deployed token address
         tokenManager.initialize(token, true, 0);
         voting.initialize(token, 50 * PCT, 20 * PCT, 1 days);
 
