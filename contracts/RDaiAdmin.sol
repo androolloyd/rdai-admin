@@ -2,12 +2,9 @@ pragma solidity ^0.4.24;
 import "@aragon/apps-agent/contracts/Agent.sol";
 import "@aragon/apps-voting/contracts/Voting.sol";
 import "@aragon/os/contracts/apps/AragonApp.sol";
-import "@aragon/os/contracts/common/SafeERC20.sol";
-import "@aragon/os/contracts/lib/token/ERC20.sol";
+import "@aragon/os/contracts/common/IForwarder.sol";
 
-contract RDaiAdmin is AragonApp {
-
-    using SafeERC20 for ERC20;
+contract RDaiAdmin is IForwarder, AragonApp {
 
     /// Events
     event NewAgentSet(address agent);
@@ -20,8 +17,6 @@ contract RDaiAdmin is AragonApp {
 
     mapping(bytes32 => address) public rTokens;
 
-    mapping(bytes32 => uint256) openVotes;
-
     /// ACL
     bytes32 public constant SET_AGENT_ROLE = keccak256("SET_AGENT_ROLE");
     bytes32 public constant SET_CONTRACT_ROLE = keccak256("SET_CONTRACT_ROLE");
@@ -30,6 +25,45 @@ contract RDaiAdmin is AragonApp {
     bytes32 public constant EXECUTE_VOTE = keccak256("EXECUTE_VOTE");
     bytes32 public constant CREATE_VOTE = keccak256("CREATE_VOTE");
 
+
+    function forward(
+        bytes _evmScript
+    )
+    public
+    {
+        require(canForward(msg.sender, _evmScript));
+        uint256 voteId = voting.newVote(
+            _executionScript,
+            "",
+            true,
+            false
+        );
+        require(voteId > 0, "forward::FAILED_ON_VOTE_CREATE");
+    }
+
+    function canForward(
+        address _sender,
+        bytes _evmCallScript
+    )
+    public
+    view
+    returns
+    (bool)
+    {
+        return canPerform(
+            _sender,
+            CREATE_VOTE,
+            arr()
+        );
+    }
+
+    function isForwarder()
+    public
+    pure
+    returns (bool)
+    {
+        return true;
+    }
 
     // do we need to setup the agent before hand or should the dao own the creation of these?
     /// @dev rToken contract address
@@ -51,77 +85,33 @@ contract RDaiAdmin is AragonApp {
         _addToken(keccak256("rDAI"), _rToken);
     }
 
-    function _addToken(
+    function addToken(
         bytes32 _tokenType,
         address _tokenAddress
     )
-        internal
+        external
+        authP(ADD_TOKEN, arr(_tokenType, _tokenAddress))
     {
         rTokens[_tokenType] = _tokenAddress;
-        emit AddToken(keccak256("rDAI"), _tokenAddress);
+        emit AddToken(_tokenType, _tokenAddress);
     }
 
-    function _newVote(
-        bytes _executionScript,
-        string _metadata,
-        bool _castVote,
-        bool _executeIfDecided
-    )
-        internal
-        returns (uint256 voteId)
-    {
-        voteId = voting.newVote(_executionScript, _metadata, _castVote, _executeIfDecided);
-    }
-
-
-    function newVote(
-        bytes _executionScript,
-        string _voteQuestion
-    )
-        auth(CREATE_VOTE)
-        external
-        returns (uint256 voteId)
-    {
-        bytes32 scriptHash = keccak256(_executionScript);
-        if(openVotes[scriptHash] != 0) {
-            (,
-            bool executed,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,
-            ,) = voting.getVote(openVotes[scriptHash]);
-            require(executed, "newVote::INVALID_VOTE_STATUS");
-        }
-        voteId = _newVote(_executionScript, _voteQuestion, true, false);
-        openVotes[scriptHash] = voteId;
-    }
-
-    function executeVote(
-        uint256 _voteId
-    )
-        external
-    {
-        require(voting.canExecute(_voteId), "executeVote::NO_EXECUTE_VOTE_ID");
-        string memory functionSignature = "executeVote(uint256)";
-        bytes memory executeVoteData = abi.encodeWithSignature(functionSignature, _voteId);
-        agent.execute(address(voting), 0, executeVoteData);
-    }
 
     //lets an agent change the hat of any target
-    function changeHat(
+    function changeContractHat(
         bytes32 _rToken,
         address _target,
         uint256 _hatId
     )
         external
-        auth(CHANGE_HAT)
+        authP(CHANGE_HAT, arr(_rToken, _target, _hatId))
     {
+        //verify there is contract data at the target
         string memory functionSignature = "changeHatFor(address, uint256)";
         bytes memory changeHatData = abi.encodeWithSignature(functionSignature, _target, _hatId);
-        emit HatChanged(msg.sender, _target, _hatId);
+
         agent.execute(rTokens[_rToken], 0, changeHatData); // target, value, data
+
+        emit HatChanged(msg.sender, _target, _hatId);
     }
 }
