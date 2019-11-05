@@ -1,19 +1,4 @@
-# Aragon React Boilerplate
-
-> 🕵️ [Find more boilerplates using GitHub](https://github.com/search?q=topic:aragon-boilerplate) |
-> ✨ [Official boilerplates](https://github.com/search?q=topic:aragon-boilerplate+org:aragon)
-
-React boilerplate for Aragon applications.
-
-This boilerplate includes a fully working example app, complete with a background worker and a front-end in React (with Aragon UI). Also comes with a DAO Template which will allow for using your app to interact with other Aragon apps like the Voting app. You can read more about DAO Template [here](https://hack.aragon.org/docs/templates-intro).
-
-## Usage
-
-To setup use the command `create-aragon-app`:
-
-```sh
-npx create-aragon-app <app-name> react
-```
+# RToken Administration Application(AragonApp)
 
 ## Structure
 
