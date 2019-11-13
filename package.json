@@ -33,7 +33,7 @@
     "truffle": "4.1.14"
   },
   "scripts": {
-    "start": "npm run start:http:template",
+    "start": "npm run start:ipfs:template",
     "start:ipfs": "aragon run --files dist",
     "start:http": "aragon run --http localhost:8001 --http-served-from ./dist",
     "start:ipfs:template": "npm run start:ipfs -- --template Template --template-init @ARAGON_ENS",

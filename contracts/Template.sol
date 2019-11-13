@@ -82,29 +82,27 @@ contract Template is TemplateBase {
 
         // Initialize apps
         agent.initialize();
-        //
-        rDaiAdminApp.initialize(address(agent), address(voting), uint256(keccak256("rDAI")), address(token)); //set this to rdai deployed token address
+        rDaiAdminApp.initialize(agent); //set this to rdai deployed token address
         tokenManager.initialize(token, true, 0);
         voting.initialize(token, 50 * PCT, 20 * PCT, 1 days);
 
         acl.createPermission(this, tokenManager, tokenManager.MINT_ROLE(), this);
         tokenManager.mint(root, 1); // Give one token to root
 
-        acl.createPermission(ANY_ENTITY, voting, voting.CREATE_VOTES_ROLE(), root);
-
         acl.grantPermission(voting, tokenManager, tokenManager.MINT_ROLE());
-
-
-        acl.createPermission(address(rDaiAdminApp), agent, agent.EXECUTE_ROLE(), root);
-        acl.createPermission(address(rDaiAdminApp), agent, agent.RUN_SCRIPT_ROLE(), root);
-        acl.createPermission(address(rDaiAdminApp), agent, agent.TRANSFER_ROLE(), root);
-        acl.createPermission(address(rDaiAdminApp), agent, rDaiAdminApp.CHANGE_HAT(), root);
-
+        acl.createPermission(rDaiAdminApp, agent, agent.EXECUTE_ROLE(), root);
+        acl.createPermission(rDaiAdminApp, agent, agent.RUN_SCRIPT_ROLE(), root);
+        acl.createPermission(rDaiAdminApp, voting, voting.CREATE_VOTES_ROLE(), root);
+        acl.createPermission(ANY_ENTITY, rDaiAdminApp, rDaiAdminApp.CREATE_VOTE(), root);
+        acl.createPermission(voting, rDaiAdminApp, rDaiAdminApp.CHANGE_ALLOC(), root);
+        acl.createPermission(voting, rDaiAdminApp, rDaiAdminApp.PROXY_UPGRADE(), root);
+        acl.createPermission(voting, rDaiAdminApp, rDaiAdminApp.CHANGE_HAT(), root);
+        acl.createPermission(voting, rDaiAdminApp, rDaiAdminApp.ADD_TOKEN(), root);
+        acl.createPermission(voting, rDaiAdminApp, rDaiAdminApp.REMOVE_TOKEN(), root);
+    
         //admin permissions
-        acl.createPermission(ANY_ENTITY, rDaiAdminApp, rDaiAdminApp.SET_AGENT_ROLE(), root);
-        acl.createPermission(ANY_ENTITY, rDaiAdminApp, rDaiAdminApp.SET_CONTRACT_ROLE(), root);
-        acl.createPermission(ANY_ENTITY, rDaiAdminApp, rDaiAdminApp.CHANGE_HAT(), root);
 
+                
         // Clean up permissions
         acl.grantPermission(root, dao, dao.APP_MANAGER_ROLE());
         acl.revokePermission(this, dao, dao.APP_MANAGER_ROLE());

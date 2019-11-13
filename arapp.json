@@ -6,18 +6,33 @@
       "params": []
     },
     {
-      "name": "Add New rToken",
-      "id": "SET_CONTRACT_ROLE",
+      "name": "Start Votes",
+      "id": "CREATE_VOTE",
       "params": []
     },
     {
-      "name": "Change Contract Hat",
-      "id": "CHANGE_CONTRACT_HAT",
+      "name": "Change Contract Hat Role",
+      "id": "CHANGE_HAT",
       "params": []
     },
     {
-      "name": "Change User Hat",
-      "id": "CHANGE_USER_HAT",
+      "name": "Change allocation strategy Role",
+      "id": "CHANGE_ALLOC",
+      "params": []
+    },
+    {
+      "name": "Add Token Hat",
+      "id": "ADD_TOKEN",
+      "params": []
+    },
+    {
+      "name": "Remove Token Role",
+      "id": "REMOVE_TOKEN",
+      "params": []
+    },
+    {
+      "name": "Change Proxy Role",
+      "id": "PROXY_UPGRADE",
       "params": []
     }
   ],
