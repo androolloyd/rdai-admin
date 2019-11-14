@@ -9,8 +9,7 @@ app.store(async (state, { event }) => {
 
   // Initial state
   if (state == null) {
-    nextState = {
-    }
+    nextState = {}
   }
 
   switch (event) {
@@ -24,4 +23,3 @@ app.store(async (state, { event }) => {
 
   return nextState
 })
-
